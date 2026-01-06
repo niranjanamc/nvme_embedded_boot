@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NVMe Boot Partitions: A Comprehensive Guide</title>
+    <meta name="description"
+        content="An interactive educational guide on NVMe Boot Partitions, standard boot sequences, and testing methodologies for embedded systems.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;500;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Navigation Sidebar -->
+        <nav class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">NVMe.Edu</span>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-target="intro">
+                    <span class="icon">🏠</span> Intro
+                </li>
+                <li data-target="boot-foundation">
+                    <span class="icon">🏗️</span> Boot Foundation
+                </li>
+                <li data-target="boot-sequence">
+                    <span class="icon">⏳</span> Standard Sequence
+                </li>
+                <li data-target="nvme-bp">
+                    <span class="icon">💾</span> NVMe Boot Partitions
+                </li>
+                <li data-target="testing">
+                    <span class="icon">🧪</span> Testing & Diagnostics
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+
+            <!-- Module 0: Introduction -->
+            <section id="intro" class="module active">
+                <div class="hero-header">
+                    <h1 class="fade-in-up">The Journey from <span class="gradient-text">Power</span> to <span
+                            class="gradient-text">OS</span></h1>
+                    <p class="subtitle fade-in-up delay-1">Understanding NVMe Boot Partitions in Embedded Systems</p>
+                </div>
+
+                <div class="card glass-panel fade-in-up delay-2">
+                    <h2>Target Audience: Testing Team</h2>
+                    <p>You test NVMe commands every day. But what happens <em>before</em> your test script runs? How
+                        does a silent chip turn into a running operating system?</p>
+                    <p>This guide bridges the gap between raw NVMe commands and the system boot process.</p>
+                </div>
+            </section>
+
+            <!-- Module 1: Boot Foundation -->
+            <section id="boot-foundation" class="module">
+                <div class="module-header">
+                    <h2>Module 1: The Boot Foundation</h2>
+                    <p>Solving the "Chicken and Egg" problem of computing.</p>
+                </div>
+
+                <div class="grid-2-col">
+                    <div class="card glass-panel">
+                        <h3>The CPU Reset Vector</h3>
+                        <p>When power stabilizes, the CPU is dumb. It only knows one thing: Go to a specific address
+                            (Reset Vector) and execute what's there.</p>
+                        <div class="code-snippet">
+                            PC (Program Counter) = 0xFFFF0
+                        </div>
+                    </div>
+                    <div class="card glass-panel">
+                        <h3>The Bootloader</h3>
+                        <p>A small program whose only job is to:</p>
+                        <ol>
+                            <li>Initialize minimal hardware (DRAM).</li>
+                            <li>Find the OS Kernel.</li>
+                            <li>Load it into RAM.</li>
+                            <li>Jump to it.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Module 2: Professional Engineering Dashboard -->
+            <section id="boot-sequence" class="module">
+                <div class="module-header">
+                    <h2>Engineering Dashboard: Embedded Boot Visualizer</h2>
+                    <p>Schematic view of SoC Initialization, PCIe Link Training, and NVMe Boot Partition Read.</p>
+                </div>
+
+                <div class="dashboard-container glass-panel">
+                    <!-- Top Bar: Clock & Voltage Rail Status -->
+                    <div class="status-bar">
+                        <div class="status-item">
+                            <span class="label">VCC_MAIN</span>
+                            <span class="value" id="val-vcc">0.0V</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">VCC_1V8</span>
+                            <span class="value" id="val-1v8">0.0V</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="label">SYS_CLK</span>
+                            <span class="value" id="val-clk">OFF</span>
+                        </div>
+                        <div class="status-item large">
+                            <span class="label">PC (Core 0)</span>
+                            <span class="value mono" id="val-pc">----</span>
+                        </div>
+                        <div class="sim-controls compact">
+                            <select id="scenario-select" class="control-select">
+                                <option value="standard">Standard Boot Sequence</option>
+                                <option value="tc1">BP_01: Capability & Discovery</option>
+                                <option value="tc2">BP_05: Pre-Enable Read (Sideband)</option>
+                                <option value="bp11">BP_11: Active Partition Swap</option>
+                                <option value="bp14">BP_14: FW Update (Download + Commit)</option>
+                                <option value="bp20">BP_20: Security Lock (TP 4170)</option>
+                                <option value="bp25">BP_25: Boundary / Negative Test</option>
+                            </select>
+                            <button id="btn-prev" class="btn-icon" disabled>⏮</button>
+                            <button id="btn-play" class="btn-icon">▶</button>
+                            <button id="btn-next" class="btn-icon">⏭</button>
+                        </div>
+                    </div>
+
+                    <!-- Main Schematic Grid -->
+                    <div class="schematic-grid">
+
+                        <!-- Col 1: Host SoC -->
+                        <div class="component-box soc-box">
+                            <div class="box-header">SoC (Host Processor)</div>
+                            <div class="soc-internals">
+                                <div class="sub-block core-complex">
+                                    <div class="block-label">ARM Cluster</div>
+                                    <div class="core active" id="core-0">Core 0</div>
+                                    <div class="core">Core 1</div>
+                                </div>
+                                <div class="sub-block internal-mem">
+                                    <div class="mem-unit" id="boot-rom">
+                                        <div class="block-label">Boot ROM</div>
+                                        <div class="mem-cell">Reset Vector</div>
+                                        <div class="mem-cell">BL1 Loader</div>
+                                    </div>
+                                    <div class="mem-unit" id="sram">
+                                        <div class="block-label">Internal SRAM</div>
+                                        <div class="mem-cell empty" id="sram-blk">Empty</div>
+                                    </div>
+                                </div>
+                                <div class="sub-block pcie-root">
+                                    <div class="block-label">PCIe Root Complex</div>
+                                    <div class="phy-status" id="rc-phy">PHY: Down</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Col 2: The Bus (Vertical) -->
+                        <div class="bus-vertical" id="pcie-link">
+                            <div class="bus-lines">
+                                <div class="line"></div>
+                                <div class="line"></div>
+                                <div class="line"></div>
+                                <div class="line"></div>
+                            </div>
+                            <div class="bus-info">
+                                <span class="bus-state" id="ltssm-state">L0 (Down)</span>
+                                <span class="bus-speed" id="link-speed">--</span>
+                            </div>
+                        </div>
+
+                        <!-- Col 3: NVMe Device -->
+                        <div class="component-box device-box">
+                            <div class="box-header">NVMe 2.0 Subsystem</div>
+                            <div class="device-internals">
+                                <div class="sub-block controller" id="nvme-ctrl">
+                                    <div class="block-label">Controller (PF0)</div>
+                                    <div class="reg-map">
+                                        <div class="reg" id="reg-vs">VS</div>
+                                        <div class="reg" id="reg-cap">CAP</div>
+                                        <div class="reg" id="reg-cc">CC</div>
+                                        <div class="reg highlight-target" id="reg-bpinfo">BPINFO</div>
+                                        <div class="reg highlight-target" id="reg-bprsel">BPRSEL</div>
+                                    </div>
+                                </div>
+                                <div class="sub-block media-flash">
+                                    <div class="block-label">NAND Flash Array</div>
+                                    <div class="partition" id="part-bp0">BP0</div>
+                                    <div class="partition active-target" id="part-bp1">BP1 (U-Boot)</div>
+                                    <div class="partition huge" id="part-user">User Namespaces</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Col 4: External DRAM -->
+                        <div class="component-box dram-box">
+                            <div class="box-header">System DDR4</div>
+                            <div class="dram-map">
+                                <div class="map-range" id="dram-os">
+                                    <span class="range-addr">0x8000_0000</span>
+                                    <span class="range-label">OS Kernel</span>
+                                </div>
+                                <div class="map-range" id="dram-bl2">
+                                    <span class="range-addr">0x4000_0000</span>
+                                    <span class="range-label">BL2 (U-Boot)</span>
+                                </div>
+                                <div class="map-range" id="dram-reserved">
+                                    <span class="range-addr">0x0000_0000</span>
+                                    <span class="range-label">Reserved</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Register Inspector (NEW) -->
+                    <div class="inspector-panel glass-panel-inset" id="reg-inspector" style="display: none;">
+                        <div class="inspector-header">
+                            <span class="inspector-title">REGISTER INSPECTOR: <span id="insp-name"
+                                    class="mono">--</span></span>
+                            <span class="inspector-addr mono" id="insp-addr">Address: --</span>
+                        </div>
+                        <div class="bit-grid" id="insp-bits">
+                            <!-- Bit fields injected by JS -->
+                        </div>
+                        <div class="reg-desc" id="insp-desc">--</div>
+                    </div>
+
+                    <!-- Console / Log Output -->
+                    <div class="console-log glass-panel-inset" id="sim-log">
+                        <span class="log-line text-muted">> System power off. Waiting for input...</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Module 3: NVMe Boot Partitions -->
+            <section id="nvme-bp" class="module">
+                <div class="module-header">
+                    <h2>Module 3: NVMe Boot Partitions (BP)</h2>
+                    <p>The NVMe Spec mechanism for simplified embedded booting.</p>
+                </div>
+
+                <div class="grid-2-col">
+                    <div class="card glass-panel">
+                        <h3>The Complexity Problem</h3>
+                        <p>Standard NVMe Read commands require a complex full-stack setup:</p>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li>❌ <strong>Admin Queue:</strong> Requires ASQ/ACQ memory allocation.</li>
+                            <li>❌ <strong>Controller Enable:</strong> Must set `CC.EN=1` and wait for `CSTS.RDY`.</li>
+                            <li>❌ <strong>Doorbell Handling:</strong> Managing submission/completion pointers.</li>
+                        </ul>
+                        <p style="margin-top: 1rem;"><strong>Too heavy for a 10KB on-chip BootROM!</strong></p>
+                    </div>
+                    <div class="card glass-panel">
+                        <h3>The Spec Solution (NVMe 1.3+)</h3>
+                        <p><strong>Boot Partitions</strong> allow data retrieval via simplified MMIO writes.</p>
+                        <div class="code-snippet">
+                            <p style="color: var(--accent-blue); margin-bottom: 0.5rem;">[Spec Definition]</p>
+                            <p><strong>CAP.BPS (Bit 45):</strong> 1 = Controller Supports Boot Partitions.</p>
+                            <p><strong>BPINFO (Offset 40h):</strong> Reports Size (BPSZ) & Active ID (ABPID).</p>
+                            <p><strong>BPRSEL (Offset 44h):</strong> The Trigger Register.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel" style="margin-top: 2rem;">
+                    <h3>Boot Partition Layout</h3>
+                    <div class="bp-visual" style="display: flex; gap: 2px; margin-top: 1rem;">
+                        <div
+                            style="flex: 1; min-width: 100px; padding: 1rem; background: rgba(59, 130, 246, 0.2); border: 1px solid var(--accent-blue); text-align: center;">
+                            BP 0 (Backup)
+                            <div style="font-size: 0.7rem;">Read-Only</div>
+                        </div>
+                        <div
+                            style="flex: 2; min-width: 150px; padding: 1rem; background: rgba(16, 185, 129, 0.2); border: 1px solid var(--success); text-align: center;">
+                            BP 1 (Active Image)
+                            <div style="font-size: 0.8rem; opacity: 0.8; margin-top: 0.5rem;">U-Boot.bin</div>
+                            <div style="font-size: 0.7rem; color: var(--success);">Selected by BPINFO.ABPID</div>
+                        </div>
+                        <div
+                            style="flex: 0.5; padding: 1rem; background: rgba(255, 255, 255, 0.05); text-align: center;">
+                            ...
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Module 4: Testing & Diagnostics -->
+            <section id="testing" class="module">
+                <div class="module-header">
+                    <h2>Module 4: Spec Compliance Testing</h2>
+                    <p>Validation Checklist for Embedded NVMe Integration.</p>
+                </div>
+
+                <div class="testing-grid">
+                    <!-- DOMAIN 1: Capability -->
+                    <div class="test-card glass-panel">
+                        <div class="test-header">
+                            <span class="test-id">Dom 1</span>
+                            <h4>Capability & Discovery</h4>
+                        </div>
+                        <p><strong>BP_01 & BP_02</strong>: Basic compliance checks.</p>
+                        <div class="checklist">
+                            <div class="check-item"><span class="check-box">◻</span><span><strong>BP_01:</strong>
+                                    CAP.BPS (Bit 45) must be 1.</span></div>
+                            <div class="check-item"><span class="check-box">◻</span><span><strong>BP_02:</strong> BPINFO
+                                    Defaults (Size > 0, ABPID Valid).</span></div>
+                            <div class="check-item"><span class="check-box">◻</span><span><strong>BP_03:</strong> BPINFO
+                                    is RO, BPSEL is R/W.</span></div>
+                        </div>
+                        <button class="btn-control run-sim-btn" data-scenario="tc1">▶ Run BP_01 (Discovery)</button>
+                    </div>
+
+                    <!-- DOMAIN 2: Pre-Enable Boot -->
+                    <div class="test-card glass-panel">
+                        <div class="test-header">
+                            <span class="test-id">Dom 2</span>
+                            <h4>Pre-Enable Boot ("PBL" Flow)</h4>
+                        </div>
+                        <p><strong>BP_05 - BP_09</strong>: Reading without Queues (`CC.EN=0`).</p>
+                        <div class="checklist">
+                            <div class="check-item"><span class="check-box">◻</span><span><strong>BP_05:</strong> Read
+                                    BP0 (SBL) while Disabled.</span></div>
+                            <div class="check-item"><span class="check-box">◻</span><span><strong>BP_08:</strong> BRS
+                                    Polling (01b -> 10b).</span></div>
+                            <div class="check-item"><span class="check-box">◻</span><span><strong>BP_09:</strong> DMA
+                                    Interruption / Reset.</span></div>
+                        </div>
+                        <button class="btn-control run-sim-btn" data-scenario="tc2">▶ Run BP_05 (Pre-Enable
+                            Read)</button>
+                    </div>
+
+                    <!-- DOMAIN 3: Active Management -->
+                    <div class="test-card glass-panel">
+                        <div class="test-header">
+                            <span class="test-id">Dom 3</span>
+                            <h4>Active Partition (Redundancy)</h4>
+                        </div>
+                        <p><strong>BP_10 - BP_13</strong>: Managing A/B boot slots.</p>
+                        <div class="checklist">
+                            <div class="check-item"><span class="check-box">◻</span><span><strong>BP_10:</strong> Read
+                                    ABPID (Current Active).</span></div>
+                            <div class="check-item"><span class="check-box">◻</span><span><strong>BP_11:</strong> Commit
+                                    Action 7 (Swap Active).</span></div>
+                            <div class="check-item"><span class="check-box">◻</span><span><strong>BP_13:</strong>
+                                    Persistence across Power Cycle.</span></div>
+                        </div>
+                        <button class="btn-control run-sim-btn" data-scenario="bp11">▶ Run BP_11 (Swap Active)</button>
+                    </div>
+
+                    <!-- DOMAIN 4: Image Update -->
+                    <div class="test-card glass-panel">
+                        <div class="test-header">
+                            <span class="test-id">Dom 4</span>
+                            <h4>Image Update (Admin Cmds)</h4>
+                        </div>
+                        <p><strong>BP_14 - BP_18</strong>: FW Download & Commit.</p>
+                        <div class="checklist">
+                            <div class="check-item"><span class="check-box">◻</span><span><strong>BP_14:</strong> FW
+                                    Image Download (Cmd 01h).</span></div>
+                            <div class="check-item"><span class="check-box">◻</span><span><strong>BP_15:</strong> FW
+                                    Commit Action 6 (Update Inactive).</span></div>
+                            <div class="check-item"><span class="check-box">◻</span><span><strong>BP_17:</strong>
+                                    Partial Update / Size Mismatch.</span></div>
+                        </div>
+                        <button class="btn-control run-sim-btn" data-scenario="bp14">▶ Run BP_14 (FW Update)</button>
+                    </div>
+
+                    <!-- DOMAIN 5: Security -->
+                    <div class="test-card glass-panel">
+                        <div class="test-header">
+                            <span class="test-id">Dom 5</span>
+                            <h4>TP 4170 Security (Locking)</h4>
+                        </div>
+                        <p><strong>BP_19 - BP_24</strong>: Write Protection.</p>
+                        <div class="checklist">
+                            <div class="check-item"><span class="check-box">◻</span><span><strong>BP_20:</strong> Set
+                                    Feature 15h (Lock BP0).</span></div>
+                            <div class="check-item"><span class="check-box">◻</span><span><strong>BP_21:</strong> Write
+                                    Rejection (Status 86h).</span></div>
+                            <div class="check-item"><span class="check-box">◻</span><span><strong>BP_23:</strong> Read
+                                    while Locked (Must Succeed).</span></div>
+                        </div>
+                        <button class="btn-control run-sim-btn" data-scenario="bp20">▶ Run BP_20 (Security
+                            Lock)</button>
+                    </div>
+
+                    <!-- DOMAIN 6: Boundary -->
+                    <div class="test-card glass-panel">
+                        <div class="test-header">
+                            <span class="test-id">Dom 6</span>
+                            <h4>Negative / Boundary Tests</h4>
+                        </div>
+                        <p><strong>BP_25 - BP_32</strong>: Error Handling.</p>
+                        <div class="checklist">
+                            <div class="check-item"><span class="check-box">◻</span><span><strong>BP_25:</strong> Offset
+                                    Overflow (> BPSZ).</span></div>
+                            <div class="check-item"><span class="check-box">◻</span><span><strong>BP_27:</strong>
+                                    Invalid BPID (e.g. ID=2).</span></div>
+                            <div class="check-item"><span class="check-box">◻</span><span><strong>BP_32:</strong> Hot
+                                    Reset Recovery.</span></div>
+                        </div>
+                        <button class="btn-control run-sim-btn" data-scenario="tc3">▶ Run BP_25 (Overflow)</button>
+                    </div>
+
+                    <!-- Test Case 4 -->
+                    <div class="test-card glass-panel">
+                        <div class="test-header">
+                            <span class="test-id">TC-04</span>
+                            <h4>Performance KPI</h4>
+                        </div>
+                        <p>Measure critical boot timing metrics.</p>
+                        <div class="metric-box">
+                            <span class="metric-label">TTFI (Time To First Instruction)</span>
+                            <span class="metric-val">
+                                < 50ms</span>
+                                    <span class="metric-desc">POR -> First valid Opcode fetch from SRAM.</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

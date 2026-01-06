@@ -1,0 +1,290 @@
+Number of pages: 5
+--- Page 1 ---
+This  is  a  comprehensive,  silicon-validation-grade  test  suite  for  NVMe  2.0d  Boot  Partitions .  
+As
+ 
+an
+ 
+architect,
+ 
+I
+ 
+have
+ 
+categorized
+ 
+these
+ 
+into
+ 
+six
+ 
+functional
+ 
+domains
+ 
+to
+ 
+ensure
+ 
+100%
+ 
+coverage
+ 
+of
+ 
+the
+ 
+specification,
+ 
+including
+ 
+the
+ 
+state
+ 
+machine
+ 
+transitions,
+ 
+register
+ 
+boundary
+ 
+conditions,
+ 
+and
+ 
+the
+ 
+TP
+ 
+4170
+ 
+security
+ 
+lifecycle.
+ 
+NVMe  2.0d  Boot  Partition  Master  Test  Matrix  Domain  1:  Capability  &  Register  Discovery  (Basic  Compliance)  
+Test  ID  Test  Name  Objective  Steps  Expectations  
+BP_01  CAP  Register  Check  
+Verify  BPS  bit.  Read  CAP  (Offset  00h).  
+Bit  15  (BPS)  must  be  1.  
+BP_02  BPINFO  Default  State  
+Verify  reset  values.  
+Read  BPINFO  (Offset  40h)  after  POR.  
+BPSZ  >  0,  BRS  =  00b,  ABPID  =  0  or  1.  
+BP_03  Register  Read/Write  
+Verify  R/W  permissions.  
+Attempt  write  to  BPINFO;  Read/Write  to  BPSEL.  
+BPINFO  is  Read-Only.  BPSEL/BPRMBL  are  R/W.  
+BP_04  Alignment  Constraint  
+Test  4KB  alignment.  
+Write  non-4KB  aligned  addr  to  BPRMBL.  
+Controller  should  ignore  lower  12  bits  or  error  out.  
+Domain  2:  Pre-Enable  Boot  Operations  (The  "PBL"  Flow)  
+These  tests  must  be  performed  while  CC.EN  =  0.  
+Test  ID  Test  Name  Objective  Steps  Expectations  
+BP_05  Pre-Enable  Read  BP0  
+Load  SBL  from  BP0.  
+Trigger  BPSEL  (BPID=0)  while  CC.EN=0.  
+BRS  transitions  01b  ->  10b.  
+--- Page 2 ---
+BP_06  Pre-Enable  Read  BP1  
+Load  SBL  from  BP1.  
+Trigger  BPSEL  (BPID=1)  while  CC.EN=0.  
+Successful  DMA  from  BP1.  
+BP_07  Consecutive  Reads  
+Verify  state  machine  reset.  
+Trigger  read  BP0;  wait  for  Success;  trigger  BP1.  
+Both  must  succeed  consecutively.  
+BP_08  BRS  Polling  Verify  BRS  timing.  
+High-frequency  poll  of  BRS  during  DMA.  
+Must  see  01b  (In  Progress)  before  10b.  
+BP_09  DMA  Interruption  
+Test  Reset  during  DMA.  
+Trigger  Read;  Toggle  CSTS.RDY  or  PCI  Reset.  
+BRS  must  return  to  00b  immediately.  
+Domain  3:  Redundancy  &  Active  Partition  Management  
+Test  ID  Test  Name  Objective  Steps  Expectations  
+BP_10  ABPID  Identification  
+Verify  active  pointer.  
+Read  BPINFO.ABPID.  
+Must  match  the  image  currently  used  for  boot.  
+BP_11  Commit  Action  7  (Switch)  
+Verify  partition  swap.  
+Firmware  Commit  (Action  111b)  to  BPID  1.  
+BPINFO.ABPID  changes  to  1.  
+BP_12  Active/Inactive  Logic  
+Verify  read  of  inactive.  
+Read  from  BPID  opposite  of  ABPID.  
+Controller  must  allow  reading  inactive  BP.  
+BP_13  Persistent  Verify  NVM  Swap  ABPID;  Power  Cycle;  
+New  ABPID  must  persist  
+--- Page 3 ---
+ABPID  storage.  Read  ABPID.  across  power  loss.  
+Domain  4:  Image  Update  &  Admin  Commands  
+Test  ID  Test  Name  Objective  Steps  Expectations  
+BP_14  FW  Image  Download  
+Test  data  buffering.  
+Use  Admin  Command  (01h)  to  send  BP  image.  
+Command  completes  with  Success.  
+BP_15  FW  Commit  Action  6  
+Update  Inactive  BP.  
+Commit  downloaded  image  to  inactive  BP.  
+BP  updated;  ABPID  does  NOT  change.  
+BP_16  FW  Commit  Action  7  
+Update  &  Swap.  
+Commit  downloaded  image  to  inactive  +  Swap.  
+BP  updated  AND  ABPID  flips.  
+BP_17  Partial  Update  Error  
+Test  size  mismatch.  
+Commit  image  smaller  than  partition  size.  
+Controller  must  zero-fill  or  reject.  
+BP_18  Large  Image  Rejection  
+Test  overflow  update.  
+Commit  image  >  BPSZ.  
+Command  fails:  "Invalid  Field  in  Command".  
+Domain  5:  TP  4170  Security  &  Write  Protection  
+Test  ID  Test  Name  Objective  Steps  Expectations  
+BP_19  Get  Log  Page  Verify  Log  Fetch  Log  ID  Reports  BP  count,  size,  
+--- Page 4 ---
+15h  Support.  15h.  and  lock  status.  
+BP_20  Set  Features  (Lock  BP)  
+Lock  BP0  until  Reset.  
+Set  Feature  15h  (BPWP=01b).  
+Log  15h  shows  BP0  is  "Locked".  
+BP_21  Locked  Write  Rejection  
+Verify  protection.  
+Attempt  FW  Commit  to  a  Locked  BP.  
+Status  Code:  Access  Denied  (86h) .  
+BP_22  Permanent  Lock  
+Test  "Write  Once"  logic.  
+Set  Feature  15h  (BPWP=10b).  
+BP  is  locked;  lock  persists  after  Power  Cycle.  
+BP_23  Read  While  Locked  
+Verify  read  access.  
+Trigger  BPSEL  read  on  a  Locked  BP.  
+Read  must  still  succeed  (Lock  only  affects  write).  
+BP_24  Unlock  Sequence  
+Verify  secure  transition.  
+Issue  unlock  (if  auth  supported).  
+Log  15h  Bit  1  clears  to  '0'.  
+Domain  6:  Negative  Testing  &  Boundary  Conditions  
+Test  ID  Test  Name  Objective  Steps  Expectations  
+BP_25  Offset  Overflow  
+Read  beyond  BPSZ.  
+Set  BPOFF  >  BPSZ.  Trigger  read.  
+BRS  =  11b  (Error).  
+BP_26  Size  Wrapping  Read  spanning  boundary.  
+Set  BPOFF  +  BPSIZE  >  BPSZ.  
+BRS  =  11b  (Error).  
+BP_27  Invalid  BPID  Select  non-existent  
+Set  BPID  =  2  in  BPSEL.  
+Controller  must  flag  Error  
+--- Page 5 ---
+BP.  in  BRS.  
+BP_28  Unaligned  Size  Test  4KB  granularity.  
+Request  2KB  via  BPSIZE  (if  not  supported).  
+Controller  must  round  up  or  Error.  
+BP_29  Concurrent  Read/EN  
+Trigger  during  CC.EN=1.  
+Trigger  BPSEL  read  while  I/O  queues  active.  
+Should  succeed  (Runtime  read  supported).  
+BP_30  Multiple  Triggers  
+Back-to-back  BPSEL.  
+Write  BPSEL  twice  before  1st  DMA  finishes.  
+Controller  must  ignore  2nd  or  restart.  
+BP_31  Log  Page  15h  vs  Info  
+Data  consistency.  
+Compare  Log  15h  BPSZ  vs  BPINFO.BPSZ.  
+Must  be  mathematically  identical.  
+BP_32  Hot  Reset  Recovery  
+Stress  test  resets.  
+Trigger  1000  PCI  Resets  during  BP  reads.  
+No  controller  hangs;  BRS  always  recovers.  
+Execution  Guide  for  Testers  
+1.  Hardware  setup:  Use  a  PCIe  protocol  analyzer  (like  Teledyne  LeCroy)  to  verify  that  the  
+DMA
+ 
+bursts
+ 
+for
+ 
+the
+ 
+Boot
+ 
+Partition
+ 
+do
+ 
+not
+ 
+use
+ 
+NVMe
+ 
+Admin/IO
+ 
+Queues.
+ 2.  Compliance  Warning:  Many  consumer  SSDs  do  not  support  TP  4170 .  If  Log  Page  15h  
+returns
+ 
+"Invalid
+ 
+Field,"
+ 
+the
+ 
+device
+ 
+is
+ 
+not
+ 
+compliant
+ 
+with
+ 
+the
+ 
+latest
+ 
+security
+ 
+revisions
+ 
+of
+ 
+NVMe
+ 
+2.0d.
+ 3.  Observation  Column:  Always  document  the  PCIe  Link  Speed  during  the  transfer.  Some  
+controllers
+ 
+down-train
+ 
+to
+ 
+Gen1
+ 
+during
+ 
+the
+ 
+pre-enable
+ 
+phase,
+ 
+which
+ 
+can
+ 
+impact
+ 
+boot
+ 
+timing.
+ 
+ 

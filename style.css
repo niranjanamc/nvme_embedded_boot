@@ -1,0 +1,842 @@
+:root {
+    --bg-dark: #0f172a;
+    --bg-card: rgba(30, 41, 59, 0.7);
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --accent-blue: #3b82f6;
+    --accent-purple: #8b5cf6;
+    --accent-cyan: #06b6d4;
+    --accent-green: #10b981;
+    --accent-orange: #f59e0b;
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    height: 100vh;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar Navigation */
+.sidebar {
+    width: 260px;
+    background: rgba(15, 23, 42, 0.95);
+    border-right: 1px solid var(--glass-border);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 3rem;
+    color: var(--text-primary);
+}
+
+.logo-text {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.nav-links li {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.nav-links li:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.nav-links li.active {
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.15), transparent);
+    color: var(--accent-blue);
+    border-left: 3px solid var(--accent-blue);
+}
+
+/* Main Content Area */
+.content-area {
+    flex: 1;
+    padding: 3rem 4rem;
+    overflow-y: auto;
+    position: relative;
+    background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 40%),
+        radial-gradient(circle at bottom left, rgba(139, 92, 246, 0.05), transparent 40%);
+}
+
+.module {
+    display: none;
+    animation: fadeIn 0.5s ease forwards;
+    max-width: 1200px;
+    /* Wider for simulation */
+    margin: 0 auto;
+}
+
+.module.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Typography & Components */
+h1 {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    line-height: 1.1;
+}
+
+h2 {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+}
+
+h3 {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--accent-cyan);
+}
+
+p {
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.glass-panel {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    margin-bottom: 2rem;
+}
+
+/* ENGINEERING DASHBOARD STYLES */
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: #0b0f19;
+    /* Darker technical background */
+    border: 1px solid #334155;
+    padding: 1.5rem;
+    min-height: 800px;
+    font-family: var(--font-mono);
+}
+
+/* Status Bar */
+.status-bar {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 1rem;
+    background: rgba(15, 23, 42, 0.8);
+    border-bottom: 1px solid var(--glass-border);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.status-item .label {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.status-item .value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent-green);
+}
+
+.status-item.large .value {
+    font-size: 1.5rem;
+    color: var(--accent-orange);
+}
+
+.sim-controls.compact {
+    margin-left: auto;
+    gap: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.control-select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
+    color: white;
+    padding: 0.4rem;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+    font-family: inherit;
+    font-size: 0.8rem;
+    width: 200px;
+    cursor: pointer;
+}
+
+.control-select option {
+    background: #0f172a;
+    color: white;
+}
+
+
+.btn-icon {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover:not(:disabled) {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+}
+
+.btn-icon:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Schematic Grid */
+.schematic-grid {
+    display: grid;
+    grid-template-columns: 3fr 1fr 3fr 2fr;
+    /* SoC | Bus | NVMe | DRAM */
+    gap: 1.5rem;
+    flex: 1;
+    position: relative;
+}
+
+.component-box {
+    border: 1px solid var(--text-secondary);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.soc-box {
+    border-color: var(--accent-blue);
+}
+
+.device-box {
+    border-color: var(--accent-cyan);
+}
+
+.dram-box {
+    border-color: var(--accent-purple);
+}
+
+.box-header {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    text-align: center;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+/* Internal Layouts */
+.soc-internals,
+.device-internals {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex: 1;
+}
+
+.sub-block {
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    padding: 0.5rem;
+    position: relative;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.block-label {
+    position: absolute;
+    top: -8px;
+    left: 10px;
+    background: #0b0f19;
+    padding: 0 5px;
+    font-size: 0.6rem;
+    color: var(--text-secondary);
+}
+
+/* SoC Specifics */
+.core-complex {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 5px;
+}
+
+.core {
+    border: 1px solid var(--glass-border);
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    min-width: 60px;
+    text-align: center;
+}
+
+.core.active {
+    border-color: var(--accent-orange);
+    color: var(--accent-orange);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+}
+
+.internal-mem {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-top: 5px;
+}
+
+.mem-unit {
+    border: 1px solid var(--glass-border);
+    padding: 0.5rem;
+    margin-top: 5px;
+}
+
+.mem-cell {
+    font-size: 0.7rem;
+    padding: 2px 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mem-cell.empty {
+    color: #555;
+    font-style: italic;
+}
+
+.mem-cell.filled {
+    background: var(--accent-green);
+    color: black;
+    font-weight: bold;
+}
+
+.pcie-root .phy-status {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--warning);
+    margin-top: 0.5rem;
+}
+
+/* Bus Vertical */
+.bus-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px dotted rgba(255, 255, 255, 0.1);
+    border-right: 1px dotted rgba(255, 255, 255, 0.1);
+}
+
+.bus-lines {
+    display: flex;
+    gap: 4px;
+    height: 100%;
+}
+
+.bus-lines .line {
+    width: 2px;
+    background: #333;
+    height: 100%;
+    transition: background 0.3s;
+}
+
+.bus-info {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.bus-state {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--text-secondary);
+}
+
+.bus-vertical.active .line {
+    background: var(--accent-cyan);
+    box-shadow: 0 0 5px var(--accent-cyan);
+}
+
+/* NVMe Specifics */
+.reg-map {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.5rem;
+    margin-top: 10px;
+}
+
+.reg {
+    border: 1px solid var(--glass-border);
+    text-align: center;
+    font-size: 0.7rem;
+    padding: 4px;
+    color: var(--text-secondary);
+}
+
+.reg.highlight-target {
+    border-color: var(--accent-blue);
+}
+
+.reg.read-active {
+    background: var(--accent-blue);
+    color: white;
+}
+
+.partition {
+    border: 1px solid var(--glass-border);
+    margin-top: 5px;
+    padding: 4px;
+    font-size: 0.75rem;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.partition.active-target {
+    border-color: var(--accent-green);
+}
+
+.partition.reading {
+    background: repeating-linear-gradient(45deg, var(--accent-green), var(--accent-green) 10px, rgba(16, 185, 129, 0.2) 10px, rgba(16, 185, 129, 0.2) 20px);
+    color: white;
+}
+
+/* DRAM States */
+.dram-box {
+    border-color: #333;
+    /* Default / Offline */
+    opacity: 0.4;
+    transition: all 0.5s ease;
+    position: relative;
+}
+
+.dram-box.uninit::after {
+    content: "OFFLINE";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #555;
+    font-weight: bold;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+}
+
+.dram-box.training {
+    border-color: var(--warning);
+    border-style: dashed;
+    opacity: 0.8;
+    animation: pulse border-pulse 1s infinite;
+}
+
+.dram-box.training::after {
+    content: "TRAINING...";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--warning);
+    font-weight: bold;
+    font-size: 1rem;
+    animation: blink 0.5s infinite;
+}
+
+.dram-box.initialized {
+    border-color: var(--accent-purple);
+    border-style: solid;
+    opacity: 1;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+}
+
+.dram-box.initialized .box-header {
+    background: rgba(139, 92, 246, 0.2);
+    color: white;
+}
+
+@keyframes border-pulse {
+    0% {
+        border-color: var(--warning);
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+    }
+
+    70% {
+        border-color: var(--warning);
+        box-shadow: 0 0 0 10px rgba(245, 158, 11, 0);
+    }
+
+    100% {
+        border-color: var(--warning);
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+    }
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+/* Data Packet TLP */
+.tlp-packet {
+    position: absolute;
+    padding: 2px 6px;
+    background: var(--accent-green);
+    color: black;
+    font-size: 0.6rem;
+    font-weight: bold;
+    border-radius: 2px;
+    box-shadow: 0 0 5px var(--accent-green);
+    z-index: 100;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+/* Module 4: Compliance Testing Styles */
+.testing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.test-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.test-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 0.5rem;
+}
+
+.test-id {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--accent-cyan);
+}
+
+.checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+.check-item {
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.check-box {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.run-sim-btn {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+    color: white;
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    padding: 0.8rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.run-sim-btn:hover {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+    transform: translateY(-2px);
+}
+
+.metric-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid var(--success);
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--success);
+    margin-bottom: 0.5rem;
+}
+
+.metric-val {
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+}
+
+.metric-desc {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+}
+
+/* Inspector Panel */
+.inspector-panel {
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid var(--accent-blue);
+    padding: 1rem;
+    border-radius: 4px;
+    animation: fadeIn 0.3s ease;
+    margin-bottom: 0.5rem;
+}
+
+.inspector-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 0.5rem;
+}
+
+.inspector-title {
+    color: var(--accent-blue);
+    font-weight: bold;
+}
+
+.inspector-addr {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.bit-grid {
+    display: flex;
+    /* Changed from grid to flex for variable width bits */
+    gap: 1px;
+    background: var(--glass-border);
+    margin-bottom: 1rem;
+    border: 1px solid var(--glass-border);
+}
+
+.bit-field {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.5rem;
+    text-align: center;
+    position: relative;
+    flex-grow: 1;
+    /* Default grow */
+}
+
+.bit-field.active {
+    background: rgba(59, 130, 246, 0.2);
+    color: var(--accent-blue);
+}
+
+.bit-label {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 2px;
+}
+
+.bit-val {
+    font-weight: bold;
+    font-family: var(--font-mono);
+}
+
+.reg-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* Console Log */
+.console-log {
+    height: 150px;
+    /* Increased height */
+    background: black;
+    border-top: 1px solid var(--glass-border);
+    overflow-y: auto;
+    padding: 0.5rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    /* Larger font */
+}
+
+.log-line {
+    display: block;
+    margin-bottom: 4px;
+    color: #64748b;
+    transition: all 0.2s;
+}
+
+.log-line.active-log {
+    color: var(--text-primary);
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid var(--accent-green);
+    padding-left: 5px;
+}
+
+.log-line.info {
+    color: var(--accent-blue);
+}
+
+.log-line.success {
+    color: var(--accent-green);
+}
+
+.log-line.warn {
+    color: var(--accent-orange);
+}
+
+
+/* Animations */
+.fade-in-up {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s ease forwards;
+}
+
+.delay-1 {
+    animation-delay: 0.1s;
+}
+
+.delay-2 {
+    animation-delay: 0.2s;
+}
+
+.delay-3 {
+    animation-delay: 0.3s;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Reusing grid for other modules */
+.grid-2-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.code-snippet {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-family: var(--font-mono);
+    color: var(--success);
+    font-size: 0.9rem;
+    border: 1px solid var(--glass-border);
+}
+
+.bp-visual {
+    display: flex;
+    gap: 2px;
+    margin-top: 1rem;
+}
